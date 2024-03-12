@@ -17,8 +17,12 @@ import java.util.stream.Collectors;
 public class ProductRepository {
     private String text;
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public ProductRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.text = read("myScript.sql");
+    }
 
     private static String read(String scriptFileName) {
         try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
@@ -32,13 +36,9 @@ public class ProductRepository {
     public String getProductName(String name){
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
-        String result = namedParameterJdbcTemplate.query(read("myScript.sql"),
+        String result = namedParameterJdbcTemplate.queryForList(text,
                 params,
-                (rs, rowNum) ->{
-                    String productName = rs.getString("product_name");
-                    System.out.println(productName);
-                    return productName;
-                }).toString();
+                String.class).toString();
         return result;
     }
 }

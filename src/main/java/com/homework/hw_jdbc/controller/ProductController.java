@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ProductController {
-    @Autowired
-    ProductRepository repository;
+    final ProductRepository repository;
+
+    public ProductController(ProductRepository repository) {
+        this.repository = repository;
+    }
 
     @GetMapping("/products/fetch-product")
     public String searchProduct(@RequestParam("name") String name){
